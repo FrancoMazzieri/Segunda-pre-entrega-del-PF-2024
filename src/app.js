@@ -4,10 +4,9 @@ const productRouter = require('./routes/products.router')
 const cartsRouter = require('./routes/carts.router')
 const viewsRouter = require('./routes/views.router')
 const ProductManager = require('./dao/fileSystem/productmanager')
-//const product = require('./ClasesProduct/productmanager')
 const { Server, Socket } = require('socket.io')
 const dbConnection = require('./config/dbConnection')
-const chatModel =require('./models/chat')
+const chatModel = require('./models/chat')
 const productManager = new ProductManager()
 
 const app = express()
@@ -69,13 +68,9 @@ wsServer.on('connection', async (clientSocket) => {
             stock
         } = data
 
-        // let producto1 = new product(title, description, price, thumbnail, code, stock)
-
         if (title == '' || description == '' || price == '' || thumbnail == '' || code == '' || stock == '') {
-            console.log('todo mal');
         } else {
             try {
-                console.log('Aca estoy');
                 await productManager.addProducts(title, description, price, thumbnail, code, stock)
                 let datos = await productManager.getProduct()
                 wsServer.emit('productoAgregado', datos)

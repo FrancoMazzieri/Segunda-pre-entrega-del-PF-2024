@@ -13,14 +13,17 @@ class MongoCartManager {
 
     async uploadProduct(cid, pid){
         try {
-            let carrito = await cartsModel.findOne({cid: cid})
-    
+            let carrito = await cartsModel.findOne({_id: cid})
+            
             let product = carrito.products.find(product => product.pid == pid)
+            console.log(cid)
+            // console.log(carrito)
+            console.log(product)
     
             if (product !== undefined) {
                 await cartsModel.updateOne(
                     {
-                        cid: cid
+                        _id: cid
                     },
                     {
                         $set:
@@ -45,10 +48,75 @@ class MongoCartManager {
         }
     }
 
-    async getCartProducts(cid){
+    async getCartProducts(cid, limit, page){
         try {
-            const cartProducts = await cartsModel.findOne({_id: cid})
+            const cartProducts = await cartsModel.paginate({_id: cid}, {limit: limit, page: page, lean: true})
+            console.log(cartProducts)
             return cartProducts
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async deleteProduct(cid, pid){
+        try {
+            let carrito = await cartsModel.findOne({cid: cid})
+    
+            let products = carrito.products.filter(product => product.pid != pid)
+
+            console.log(products)
+
+            // await cartsModel.findByIdAndUpdate(cid, products)
+
+            await cartsModel.updateOne(
+                {
+                    cid: cid
+                },
+                {
+                    $set:
+                    {
+                        'products': products
+                    }
+                }
+            )
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async deleteCartProducts(cid){
+        try {
+            let products = []
+
+            await cartsModel.updateOne(
+                {
+                    _id: cid
+                },
+                {
+                    $set:
+                    {
+                        'products': products
+                    }
+                }
+            )
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async arrayProductsUpdate(cid, data){
+        try {
+            await cartsModel.updateOne(
+                {
+                    _id: cid
+                },
+                {
+                    $set:
+                    {
+                        'products': data
+                    }
+                }
+            )
         } catch (error) {
             console.log(error)
         }
