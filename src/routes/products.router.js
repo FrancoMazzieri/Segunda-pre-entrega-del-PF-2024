@@ -11,7 +11,7 @@ const leerProductos = mongoProductManager.getProducts()
 ProductRouter.get('/', async (req, res)=>{
     const {limit, page = 1} = req.query       // se recibe limit del query
     try {
-        let data = await mongoProductManager.getProducts(limit)
+        let data = await mongoProductManager.getProducts()
 
         res.send(data.docs)
     } catch (error) {
@@ -20,7 +20,7 @@ ProductRouter.get('/', async (req, res)=>{
 })
 
 ProductRouter.get('/:pid', async (req, res)=>{
-    const {pid} = req.params        // se recibe pid de los parametros
+    const {pid} = req.query        // se recibe pid de los parametros
     try {
         const allProducts = await mongoProductManager.getProducts()
         const productById = await mongoProductManager.getProductById(pid)

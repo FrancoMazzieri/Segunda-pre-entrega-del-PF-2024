@@ -6,24 +6,90 @@ const productsModel  = require('../models/products')
 
 const CartRouter = Router()
 
-const productManager = new ProductManager()
-const cartManager = new CartManager ()
 const mongoCartManager = new MongoCartManager()
 
+CartRouter.post('/', async (req, res) => {
+    await mongoCartManager.createCart()
 
-CartRouter.post("/", async(req, res)=>{
-    res.send(await mongoCartManager.addCarts())
+    res.send({mensaje: "carrito creado"})
 })
-CartRouter.get("/", async(req, res)=>{
-    res.send(await mongoCartManager.readCarts())
+
+CartRouter.get('/:cid', async (req, res) => {
+    const { cid } = req.params              // se recibe cid de los parametros
+    const {limit = 1 , page = 1, query} = req.query
+    try {
+        const cartProducts = await mongoCartManager.getCartProducts(cid, limit, page)
+        
+        res.send(cartProducts)
+    } catch (error) {
+        console.log(error)
+    }
 })
-CartRouter.get("/:id", async(req, res)=>{
-    res.send(await mongoCartManager.getCartById(req.params.id))
+
+CartRouter.post('/:cid/product/:pid', async (req, res) => {
+    const { cid, pid } = req.params         // se reciben cid, pid de los parametros
+
+    try {
+        await mongoCartManager.uploadProduct(cid, pid)
+
+        res.send({mensaje: "producto agregado al carrito"})
+
+    } catch (error) {
+        console.log(error)
+    }
 })
-CartRouter.post("/:cid/products/:pid", async(req, res)=>{
-    let cartId = req.params.cid
-    let productId = req.params.pid
-    res.send(await mongoCartManager.addProductInCart(cartId, productId))
+
+CartRouter.delete('/:cid/product/:pid', async (req, res) => {
+    const { cid, pid } = req.params         // se reciben cid, pid de los parametros
+
+    try {
+        await mongoCartManager.deleteProduct(cid, pid)
+
+        res.send({mensaje: "producto eliminado del carrito"})
+
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+CartRouter.put('/:cid/product/:pid', async (req, res) => {
+    const { cid, pid } = req.params         // se reciben cid, pid de los parametros
+
+    try {
+        await mongoCartManager.uploadProduct(cid, pid)
+
+        res.send({mensaje: "producto agregado al carrito"})
+
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+CartRouter.delete('/:cid', async (req, res) => {
+    const { cid, pid } = req.params         // se reciben cid, pid de los parametros
+
+    try {
+        await mongoCartManager.deleteCartProducts(cid)
+
+        res.send({mensaje: "todos los productos eliminados del carrito"})
+
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+CartRouter.put('/:cid', async (req, res) => {
+    const { cid } = req.params         // se reciben cid, pid de los parametros
+    const data = req.body
+
+    try {
+        await mongoCartManager.arrayProductsUpdate(cid, data)
+
+        res.send({mensaje: "Array de productos agregado al carrito"})
+
+    } catch (error) {
+        console.log(error)
+    }
 })
 
 module.exports = CartRouter;

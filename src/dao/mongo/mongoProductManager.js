@@ -24,6 +24,10 @@ class MongoProductManager{
         }
     }
 
+    async getProductCant(){
+        return productsModel.length
+    }
+
     async getProductById(pid){
         try {
             const data = await productsModel.find()
@@ -50,4 +54,5 @@ class MongoProductManager{
         }
     }
 }
+
 module.exports = MongoProductManager

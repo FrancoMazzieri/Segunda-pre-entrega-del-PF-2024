@@ -70,42 +70,9 @@ class ProductManager {
         return id
 
     }
-    /*
-    async addProducts(title, description, price, thumbnail, code, stock) {
-        const product = {
-            title,
-            description,
-            price,
-            thumbnail,
-            code,
-            stock,
-        }
-        try {
 
-            if (fs.existsSync(this.path)) {     //si el archivo existe se pushea el producto
-                console.log("existe el archivo");
-                let data = await fs.promises.readFile(this.path, 'utf-8') //data en JSON
-                let dataJS = JSON.parse(data)                             //data en JS
-
-                product.id = dataJS[dataJS.length - 1].id + 1             //agrego id
-                dataJS.push(product)
-
-                await fs.promises.writeFile(this.path, `${JSON.stringify(dataJS, null, 2)}`, 'utf-8')        //se escribe en el archivo los productos en JSON
-
-            } else {                           //si el archivo NO existe se crea uno
-                product.id = 1
-                const arrProducts = [product]
-
-                await fs.promises.writeFile(this.path, `${JSON.stringify(arrProducts, null, 2)}`, 'utf-8')   //se crea el archivo con el producto en JSON
-            }
-
-        } catch (error) {
-            console.log(error)
-        }
-    }
-*/
-    async addProducts(title, description, price, thumbnail, code, stock) {
-        //this.products = this.getProduct()
+    async addProduct(title, description, price, thumbnail, code, stock) {
+       
         const product = {
             title,
             description,
@@ -120,7 +87,7 @@ class ProductManager {
             return console.log("Complete todos los campos")
 
         }
-        const prods = await this.getProduct()
+        const prods = await this.getProducts()
         const codeValidat = prods.find(prod => prod.code === code)
 
         if (codeValidat) {
@@ -143,7 +110,7 @@ class ProductManager {
         await fs.promises.writeFile(this.path, filecontent)
 
     }
-    async getProduct() {
+    async getProducts() {
         try {
             const usersFileContent = await fs.promises.readFile(this.path, 'utf-8')
             return JSON.parse(usersFileContent)
@@ -214,26 +181,17 @@ const main = async () => {
 
     const productManager = new ProductManager();
 
-    /*const producto1 = new product("Coca", "Gaseosa", 500, "link", 16, 2);
-    const producto2 = new product("Matarazo", "Fideo", 400, "link", 17, 3);
-    const producto3 = new product("Rexona", "Jabón", 250, "link", 1, 4);
-    const producto4 = new product("Head&Shoulders", "shampoo", 1500, "link", 150, 6);
-*/
-    await productManager.addProducts("Coca", "Gaseosa", 500, "link", 16, 2)
-    await productManager.addProducts("Matarazo", "Fideo", 400, "link", 17, 3)
-    await productManager.addProducts("Rexona", "Jabón", 250, "link", 1, 4)
-    await productManager.addProducts("Head&Shoulders", "shampoo", 1500, "link", 150, 6)
 
-    console.log(await productManager.getProduct())
+    await productManager.addProduct("Coca", "Gaseosa", 500, "link", 16, 2)
+    await productManager.addProduct("Matarazo", "Fideo", 400, "link", 17, 3)
+    await productManager.addProduct("Rexona", "Jabón", 250, "link", 1, 4)
+    await productManager.addProduct("Head&Shoulders", "shampoo", 1500, "link", 150, 6)
 
-    //productManager.getProductById(3)
+    console.log(await productManager.getProducts())
 
-    //productManager.updateProduct(2, producto1)
-
-    //productManager.deleteProduct(2)
 }
 
-main()
+
 
 module.exports = ProductManager, product
 

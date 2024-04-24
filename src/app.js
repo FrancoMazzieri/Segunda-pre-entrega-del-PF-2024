@@ -3,11 +3,16 @@ const handlebars = require('express-handlebars')
 const productRouter = require('./routes/products.router')
 const cartsRouter = require('./routes/carts.router')
 const viewsRouter = require('./routes/views.router')
+
 const ProductManager = require('./dao/fileSystem/productmanager')
+const MongoProductManager = require('./dao/mongo/mongoProductManager')
+
 const { Server, Socket } = require('socket.io')
 const dbConnection = require('./config/dbConnection')
 const chatModel = require('./models/chat')
+
 const productManager = new ProductManager()
+const mongoProductManager = new MongoProductManager()
 
 const app = express()
 
@@ -26,7 +31,6 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 app.use('/', viewsRouter)
-
 app.use('/api/products', productRouter)
 app.use('/api/carts', cartsRouter)
 
@@ -49,7 +53,9 @@ let mensajes
 wsServer.on('connection', async (clientSocket) => {
     console.log(`Cliente conectado, ID: ${clientSocket.id}`)
     try {
-        productos = await productManager.getProduct()
+
+        productos = await productManager.getProducts()
+
         mensajes = await chatModel.find()
         clientSocket.emit('mensajeServer', productos)
         clientSocket.emit('mensajesChat', mensajes)
@@ -71,8 +77,8 @@ wsServer.on('connection', async (clientSocket) => {
         if (title == '' || description == '' || price == '' || thumbnail == '' || code == '' || stock == '') {
         } else {
             try {
-                await productManager.addProducts(title, description, price, thumbnail, code, stock)
-                let datos = await productManager.getProduct()
+                await productManager.addProduct(title, description, price, thumbnail, code, stock)
+                let datos = await productManager.getProducts()
                 wsServer.emit('productoAgregado', datos)
             } catch (error) {
                 console.log(error)
@@ -83,8 +89,8 @@ wsServer.on('connection', async (clientSocket) => {
     clientSocket.on('deleteProduct', async data => {
         try {
             await productManager.deleteProduct(data)
-            let datos = await productManager.getProduct()
-            wsServer.emit('prodcutoEliminado', datos)
+            let datos = await productManager.getProducts()
+            wsServer.emit('productoEliminado', datos)
         } catch (error) {
             console.log(error)
         }

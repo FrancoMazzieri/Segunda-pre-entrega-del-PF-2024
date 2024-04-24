@@ -11,7 +11,8 @@ const productManager = new ProductManager()
 const route = new Router()
 
 route.get('/products', async (req, res)=>{
-    const {limit = 1 , page = 1, query} = req.query
+
+    const {limit = 10 , page = 1, query} = req.query
     let filtro = {}
     query? filtro = {category: query} : filtro = {}
     try {
